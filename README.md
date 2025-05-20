@@ -5,7 +5,7 @@ This repository serves as an artifact demonstrating how federated user and workl
 
 GDS invited a number of providers to come together collaboratively in our offices for a day to kick this off, with an expectation that this would receive long term support/maintenance from those providers and the invitation is open to any other providers that wish to contribute the relevant implementation for their domain.
 
-The initial day was set out in [Levels](#levels) to game-ify and provide a easy way to create tests, and measure how everyone was getting on, these levels are useful to clearly show the capability achieved too. j
+The initial day was set out in [Levels](#levels) to game-ify and provide a easy way to create tests, and measure how everyone was getting on, these levels are useful to clearly show the capability achieved too. 
 
 ## [Infrastructure as code](./iac/)
 
