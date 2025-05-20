@@ -29,7 +29,7 @@ jobs:
           allow-no-subscriptions: false # set to true if you want to proceed without a subscription
       
       - uses: hashicorp/setup-terraform@v3
-      - run: terraform fmt -check
+      - run: terraform fmt -check -recursive
       - run: terraform init -input=false
       - run: terraform validate -no-color
       - run: terraform plan  -no-color -input=false
