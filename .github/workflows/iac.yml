@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: iac
+        working-directory: iac/azure/level2
     steps:
       - uses: actions/checkout@v3
 
