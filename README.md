@@ -19,7 +19,7 @@ Tests are provided, to prove everything works, and continues to work.
 There are some stubs of tests created by GDS to kick things off and written in [cucumber-js](https://cucumber.io/docs/guides/overview) so that they can be written in plain english and the providers can create the necessary implementation to prove that it works in typescript
 
 ## [Workload app](./workload/)
-There is a simple workload app stub in this repository that can function as a starting point for the providers to build their own workload app, we expect all apps to be written in Typescript and include local unit tests with sufficient coverage to prove the app is working in isolation. j
+There is a simple workload app stub in this repository that can function as a starting point for the providers to build their own workload app, we expect all apps to be written in Typescript and include local unit tests with sufficient coverage to prove the app is working in isolation. 
 
 
 ## Levels
