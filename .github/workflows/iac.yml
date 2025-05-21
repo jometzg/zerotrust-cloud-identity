@@ -36,7 +36,7 @@ jobs:
           echo "ARM_SUBSCRIPTION_ID=${{ secrets.AZURE_SUBSCRIPTION_ID }}" >> $GITHUB_ENV
       
       - uses: hashicorp/setup-terraform@v3
-      - run: terraform fmt -check -recursive
+      - run: terraform fmt -check 
       - run: terraform init -input=false -upgrade
       - run: terraform validate -no-color
       - run: terraform plan  -no-color -input=false
