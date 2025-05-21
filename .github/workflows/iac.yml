@@ -27,6 +27,13 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           allow-no-subscriptions: false # set to true if you want to proceed without a subscription
+
+      
+      - name: Set Azure environment variables
+        run: |
+          echo "ARM_CLIENT_ID=${{ secrets.AZURE_CLIENT_ID }}" >> $GITHUB_ENV
+          echo "ARM_TENANT_ID=${{ secrets.AZURE_TENANT_ID }}" >> $GITHUB_ENV
+          echo "ARM_SUBSCRIPTION_ID=${{ secrets.AZURE_SUBSCRIPTION_ID }}" >> $GITHUB_ENV
       
       - uses: hashicorp/setup-terraform@v3
       - run: terraform fmt -check -recursive
@@ -34,6 +41,7 @@ jobs:
       - run: terraform validate -no-color
       - run: terraform plan  -no-color -input=false
 
+  
 
 
 # TODO give access to secrets 
