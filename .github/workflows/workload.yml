@@ -200,6 +200,9 @@ jobs:
     needs: acr_push
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
+    permissions:
+      id-token: write
+      contents: read
     steps:
       - name: Azure login
         uses: azure/login@v2
