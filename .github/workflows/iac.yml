@@ -40,20 +40,21 @@ jobs:
       - run: terraform init -input=false -upgrade
       - run: terraform validate -no-color
       - run: terraform plan  -no-color -input=false
+      - run: terraform apply -auto-approve -input=false -no-color
 
   
 
 
 # TODO give access to secrets 
-  apply:
-    needs: check
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    defaults:
-      run:
-        working-directory: iac/azure/level2
-    steps:
-        - uses: actions/checkout@v3
-        - uses: hashicorp/setup-terraform@v3
-        - run: terraform apply -auto-approve
-        # TODO need to put the state somewhere
+#  apply:
+#    needs: check
+#    runs-on: ubuntu-latest
+#    if: github.ref == 'refs/heads/main'
+#    defaults:
+#      run:
+#        working-directory: iac/azure/level2
+#    steps:
+#        - uses: actions/checkout@v3
+#        - uses: hashicorp/setup-terraform@v3
+#        - run: terraform apply -auto-approve
+##        # TODO need to put the state somewhere
