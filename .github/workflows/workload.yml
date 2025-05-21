@@ -228,6 +228,7 @@ jobs:
             --registry-password ${{ secrets.ACR_PASSWORD }} \
             --cpu 1 --memory 1 \
             --dns-name-label workload-example-${{ github.run_number }} \
-            --ports 80
+            --ports 80 \
+            --os-type Linux
         env:
           AZURE_RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
