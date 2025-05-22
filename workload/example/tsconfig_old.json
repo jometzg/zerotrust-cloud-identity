@@ -6,9 +6,8 @@
     "strict": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "outDir": "./dist",
-    "typeRoots": ["./node_modules/@types", "./types"]
+    "outDir": "./dist"
   },
-  "include": ["**/*.ts", "types/**/*.d.ts"],
+  "include": ["**/*.ts"],
   "exclude": ["node_modules"]
-}
+} 
