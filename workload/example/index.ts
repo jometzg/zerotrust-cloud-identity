@@ -6,17 +6,7 @@ import passport from 'passport'
 import { BearerStrategy } from 'passport-azure-ad'
 
 // Extend Express.User type to include id, name, roles, and scope
-import 'express'
-declare global {
-  namespace Express {
-    interface User {
-      id: string;
-      name?: string;
-      roles?: string[];
-      scope?: string;
-    }
-  }
-}
+import '../../types/express'
 
 // Define types for workload configuration
 export interface Workload {
