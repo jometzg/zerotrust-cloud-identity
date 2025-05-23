@@ -5,3 +5,5 @@ e2e_test/cucumber-report*
 e2e_test/videos/*
 workload_old/*/node_modules
 workload_old/*/coverage
+iac/azure/*/.terraform
+iac/azure/*/*.tfstate*
