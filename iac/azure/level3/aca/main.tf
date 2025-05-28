@@ -22,23 +22,10 @@ provider "azurerm" {
   features {}
 }
 
-resource "azurerm_resource_group" "acr_rg" {
+resource "azurerm_resource_group" "aca_rg" {
   name     = var.resource_group_name
   location = var.resource_group_location
 
-}
-
-resource "random_integer" "acr_suffix" {
-  min = 10000
-  max = 99999
-}
-
-resource "azurerm_container_registry" "acr" {
-  name                = "zerotrustacr${random_integer.acr_suffix.result}"
-  resource_group_name = azurerm_resource_group.acr_rg.name
-  location            = azurerm_resource_group.acr_rg.location
-  sku                 = "Basic"
-  admin_enabled       = false
 }
 
 # Create a Log Analytics workspace for Container App Environment
