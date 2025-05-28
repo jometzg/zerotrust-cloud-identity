@@ -23,7 +23,7 @@ data "azurerm_subscription" "current" {}
 
 # Get user by UPN (if you know the email)
 data "azuread_user" "azure_user" {
-  user_principal_name = "gdsfed@MngEnvMCAP050695.onmicrosoft.com"
+  user_principal_name = "gdsfed@MngEnvMCAP485016.onmicrosoft.com"
 }
 
 # Create Azure AD security group
