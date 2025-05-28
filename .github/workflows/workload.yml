@@ -96,10 +96,11 @@ jobs:
 
 
   docker_push:
-    if: github.ref == 'refs/heads/main'
+    if: startsWith(github.ref, 'refs/heads/main')
     permissions:
       contents: read
       packages: write
+      id-token: write
     needs: [discover]
     runs-on: ubuntu-latest
     strategy:
@@ -121,6 +122,15 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
         
+      - name: Azure login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          allow-no-subscriptions: false
+
+
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v5
@@ -128,6 +138,50 @@ jobs:
           images: ghcr.io/${{ github.repository_owner }}/workload-${{ matrix.workload }}
           tags: |
             type=sha
+  acr_push:
+    if: github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+      packages: write
+    needs: [discover]
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        workload: ${{ fromJson(needs.discover.outputs.workloads) }}
+      fail-fast: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        
+      - uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        
+      - name: Login to Azure Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ vars.ACR_NAME }}
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+        
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ vars.ACR_NAME }}/${{ github.repository_owner }}/workload-${{ matrix.workload }}
+          tags: |
+            type=sha
+      - name: Push
+        uses: docker/build-push-action@v6
+        with:
+          platforms: linux/amd64,linux/arm64
+          context: workload/${{ matrix.workload }}
+          load: false
+          cache-from: type=registry,ref=ghcr.io/${{ github.repository_owner }}/workload-${{ matrix.workload }}:latest
+          push: ${{ github.ref == 'refs/heads/main' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          annotations: ${{ steps.meta.outputs.annotations }}
 
       - name: Push
         uses: docker/build-push-action@v6
@@ -140,3 +194,41 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           annotations: ${{ steps.meta.outputs.annotations }}
+
+  deploy_aci:
+    name: Deploy example workload to Azure Container Instances
+    needs: acr_push
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Azure login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Set image name
+        id: set_image
+        run: |
+          IMAGE_NAME="${{ vars.ACR_NAME }}/${{ github.repository_owner }}/workload-example:sha-${GITHUB_SHA::7}"
+          echo "image=$IMAGE_NAME" >> $GITHUB_OUTPUT
+
+      - name: Deploy to Azure Container Instances
+        run: |
+          az container create \
+            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+            --name workload-example \
+            --image ${{ steps.set_image.outputs.image }} \
+            --registry-login-server ${{ vars.ACR_NAME }} \
+            --registry-username ${{ secrets.ACR_USERNAME }} \
+            --registry-password ${{ secrets.ACR_PASSWORD }} \
+            --cpu 1 --memory 1 \
+            --dns-name-label workload-example-${{ github.run_number }} \
+            --ports 80 \
+            --os-type Linux
+        env:
+          AZURE_RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}

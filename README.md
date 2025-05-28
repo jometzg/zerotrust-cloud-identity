@@ -5,7 +5,7 @@ This repository serves as an artifact demonstrating how federated user and workl
 
 GDS invited a number of providers to come together collaboratively in our offices for a day to kick this off, with an expectation that this would receive long term support/maintenance from those providers and the invitation is open to any other providers that wish to contribute the relevant implementation for their domain.
 
-The initial day was set out in [Levels](#levels) to game-ify and provide a easy way to create tests, and measure how everyone was getting on, these levels are useful to clearly show the capability achieved too.
+The initial day was set out in [Levels](#levels) to game-ify and provide a easy way to create tests, and measure how everyone was getting on, these levels are useful to clearly show the capability achieved too. 
 
 ## [Infrastructure as code](./iac/)
 
@@ -16,10 +16,10 @@ We will be using [Terraform](https://www.terraform.io/) for this, and providers 
 ## [Tests](./e2e_test/)
 
 Tests are provided, to prove everything works, and continues to work.
-There are some stubs of tests created by GDS to kick things off and written in [cucumber-js](https://cucumber.io/docs/guides/overview) so that they can be written in plain english and the providers can create the necessary implementation to prove that it works in typescript
+There are some stubs of tests created by GDS to kick things off and written in [cucumber-js](https://cucumber.io/docs/guides/overview) so that they can be written in plain english and the providers can create the necessary implementation to prove that it works in typescript 
 
 ## [Workload app](./workload/)
-There is a simple workload app stub in this repository that can function as a starting point for the providers to build their own workload app, we expect all apps to be written in Typescript and include local unit tests with sufficient coverage to prove the app is working in isolation.
+There is a simple workload app stub in this repository that can function as a starting point for the providers to build their own workload app, we expect all apps to be written in Typescript and include local unit tests with sufficient coverage to prove the app is working in isolation. 
 
 
 ## Levels
