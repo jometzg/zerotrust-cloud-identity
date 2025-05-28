@@ -1,6 +1,7 @@
 name: Workload CI
 
 on:
+  workflow_dispatch:
   push:
     branches: [ main ]
   pull_request:
@@ -138,6 +139,7 @@ jobs:
           images: ghcr.io/${{ github.repository_owner }}/workload-${{ matrix.workload }}
           tags: |
             type=sha
+
   acr_push:
     if: github.ref == 'refs/heads/main'
     permissions:
@@ -194,41 +196,3 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           annotations: ${{ steps.meta.outputs.annotations }}
-
-  deploy_aci:
-    name: Deploy example workload to Azure Container Instances
-    needs: acr_push
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    permissions:
-      id-token: write
-      contents: read
-    steps:
-      - name: Azure login
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-
-      - name: Set image name
-        id: set_image
-        run: |
-          IMAGE_NAME="${{ vars.ACR_NAME }}/${{ github.repository_owner }}/workload-example:sha-${GITHUB_SHA::7}"
-          echo "image=$IMAGE_NAME" >> $GITHUB_OUTPUT
-
-      - name: Deploy to Azure Container Instances
-        run: |
-          az container create \
-            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
-            --name workload-example \
-            --image ${{ steps.set_image.outputs.image }} \
-            --registry-login-server ${{ vars.ACR_NAME }} \
-            --registry-username ${{ secrets.ACR_USERNAME }} \
-            --registry-password ${{ secrets.ACR_PASSWORD }} \
-            --cpu 1 --memory 1 \
-            --dns-name-label workload-example-${{ github.run_number }} \
-            --ports 80 \
-            --os-type Linux
-        env:
-          AZURE_RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
