@@ -72,7 +72,7 @@ resource "azurerm_container_group" "aci" {
     }
   }
 
-  ip_address_type = "public"
+  ip_address_type = "Public"
   dns_name_label  = "aci-demo-${random_id.dns.hex}"
 }
 
