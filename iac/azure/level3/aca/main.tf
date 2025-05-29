@@ -22,6 +22,11 @@ provider "azurerm" {
   features {}
 }
 
+data "azurerm_container_registry" "acr" {
+  name                = "jjtest"
+  resource_group_name = "acr-rg"
+}
+
 resource "azurerm_resource_group" "aca_rg" {
   name     = var.resource_group_name
   location = var.resource_group_location
@@ -31,8 +36,8 @@ resource "azurerm_resource_group" "aca_rg" {
 # Create a Log Analytics workspace for Container App Environment
 resource "azurerm_log_analytics_workspace" "aca_logs" {
   name                = "zerotrust-aca-logs"
-  location            = azurerm_resource_group.acr_rg.location
-  resource_group_name = azurerm_resource_group.acr_rg.name
+  location            = azurerm_resource_group.aca_rg.location
+  resource_group_name = azurerm_resource_group.aca_rg.name
   sku                 = "PerGB2018"
   retention_in_days   = 30
 }
@@ -40,21 +45,21 @@ resource "azurerm_log_analytics_workspace" "aca_logs" {
 # Create Container App Environment
 resource "azurerm_container_app_environment" "aca_env" {
   name                       = "zerotrust-aca-env"
-  location                   = azurerm_resource_group.acr_rg.location
-  resource_group_name        = azurerm_resource_group.acr_rg.name
+  location                   = azurerm_resource_group.aca_rg.location
+  resource_group_name        = azurerm_resource_group.aca_rg.name
   log_analytics_workspace_id = azurerm_log_analytics_workspace.aca_logs.id
 }
 
 # Create a user-assigned managed identity for Container App to access ACR
 resource "azurerm_user_assigned_identity" "aca_identity" {
   name                = "zerotrust-aca-identity"
-  location            = azurerm_resource_group.acr_rg.location
-  resource_group_name = azurerm_resource_group.acr_rg.name
+  location            = azurerm_resource_group.aca_rg.location
+  resource_group_name = azurerm_resource_group.aca_rg.name
 }
 
 # Grant the managed identity AcrPull role on the container registry
 resource "azurerm_role_assignment" "aca_acr_pull" {
-  scope                = azurerm_container_registry.acr.id
+  scope                = data.azurerm_container_registry.acr.id
   role_definition_name = "AcrPull"
   principal_id         = azurerm_user_assigned_identity.aca_identity.principal_id
 }
@@ -63,7 +68,7 @@ resource "azurerm_role_assignment" "aca_acr_pull" {
 resource "azurerm_container_app" "workload_app" {
   name                         = "zerotrust-workload-app"
   container_app_environment_id = azurerm_container_app_environment.aca_env.id
-  resource_group_name          = azurerm_resource_group.acr_rg.name
+  resource_group_name          = azurerm_resource_group.aca_rg.name
   revision_mode               = "Single"
 
   identity {
@@ -72,7 +77,7 @@ resource "azurerm_container_app" "workload_app" {
   }
 
   registry {
-    server   = azurerm_container_registry.acr.login_server
+    server   = data.azurerm_container_registry.acr.login_server
     identity = azurerm_user_assigned_identity.aca_identity.id
   }
 
@@ -82,7 +87,7 @@ resource "azurerm_container_app" "workload_app" {
 
     container {
       name   = "workload-app"
-      image  = "${azurerm_container_registry.acr.login_server}/zerotrust-workload:latest"
+      image  = "${data.azurerm_container_registry.acr.login_server}/zerotrust-workload:latest"
       cpu    = 0.25
       memory = "0.5Gi"
 
@@ -152,7 +157,7 @@ variable "resource_group_location" {
 # Outputs
 output "acr_login_server" {
   description = "Azure Container Registry login server URL"
-  value       = azurerm_container_registry.acr.login_server
+  value       = data.azurerm_container_registry.acr.login_server
 }
 
 output "container_app_fqdn" {
@@ -164,4 +169,6 @@ output "container_app_url" {
   description = "Container App URL"
   value       = "https://${azurerm_container_app.workload_app.latest_revision_fqdn}"
 }
+
+
 

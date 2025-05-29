@@ -12,3 +12,6 @@ resource_group_name = "gds4-rg"
 
 # Resource Group Location
 resource_group_location = "uksouth"
+
+# container registry name
+container_registry_name = "gds4acr"
