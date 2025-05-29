@@ -19,7 +19,7 @@ provider "azuread" {
 }
 
 resource "azurerm_resource_group" "rg" {
-  name     = "gds-rg"
+  name     = "gds2-rg"
   location = "UK South"
 }
 
